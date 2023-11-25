@@ -1,0 +1,92 @@
+--33 DISTINCT users IN daily_activity TABLE
+SELECT 
+  COUNT(DISTINCT id)
+FROM 
+  `gda1-397615.Fitbit.dailyActivity_merged`; 
+--24 DISTINCT users IN sleepDay TABLE
+SELECT
+  COUNT(DISTINCT id)
+FROM
+  `gda1-397615.Fitbit.sleepDay_merged`; 
+--33 DISTINCT users IN hourly TABLE
+SELECT
+  COUNT(DISTINCT id)
+FROM
+  `gda1-397615.Fitbit.weightLogInfo_merged`;
+--8 DISTINCT users IN weight TABLE
+SELECT
+  COUNT(DISTINCT id)
+FROM
+  `gda1-397615.Fitbit.hourlyactivity_merged`;
+--7 DISTINCT users IN heartrate TABLE
+SELECT
+  COUNT(DISTINCT id)
+FROM
+  `gda1-397615.Fitbit.heartrate_seconds_merged`;
+--NO DUPLICATES IN dailyactivity
+SELECT
+  id,
+  COUNT(ActivityDate) AS count
+FROM
+  `gda1-397615.Fitbit.dailyActivity_merged`
+GROUP BY
+  Id,
+  ActivityDate
+HAVING (count > 1);
+--3 DUPLICATES IN sleepDay
+SELECT
+  Id,
+  COUNT(SleepDay) AS count
+FROM
+  `gda1-397615.Fitbit.sleepDay_merged`
+GROUP BY
+  Id,
+  SleepDay
+HAVING (count > 1);
+
+--Removing the duplicates
+CREATE OR REPLACE TABLE
+  `gda1-397615.Fitbit.sleepDay_merged_cleaned` AS
+SELECT
+  *
+FROM (
+  SELECT
+    *,
+    ROW_NUMBER() OVER (PARTITION BY Id, SleepDay ORDER BY SleepDay DESC) AS rn
+  FROM
+    `gda1-397615.Fitbit.sleepDay_merged` )
+WHERE
+  rn = 1; 
+
+--NO DUPLICATES IN weight TABLE
+SELECT
+  Id,
+  COUNT(Date) AS count
+FROM
+  `gda1-397615.Fitbit.weightLogInfo_merged`
+GROUP BY
+  Id,
+  Date
+HAVING (count > 1); 
+
+--CHECKING FOR NULLS
+SELECT
+  *
+FROM
+  `gda1-397615.Fitbit.dailyActivity_merged`
+WHERE
+  ActivityDate IS NULL;
+
+SELECT
+  *
+FROM
+  `gda1-397615.Fitbit.sleepDay_merged`
+WHERE
+  SleepDay IS NULL;
+
+SELECT
+  *
+FROM
+  `gda1-397615.Fitbit.weightLogInfo_merged`
+WHERE
+  Date IS NULL;
