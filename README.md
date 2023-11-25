@@ -130,4 +130,14 @@ FROM
 GROUP BY ActivityHour
 ORDER BY ActivityHour;
 ```
-ORDER BY ActivityHour;
+## 📩 SHARE
+[Tableau Dashboard](https://public.tableau.com/views/BellaBeatCaseStudy_17002247690100/Dashboard1?:language=en-GB&:display_count=n&:origin=viz_share_link)
+
+[Tableau Storyboard](https://public.tableau.com/views/BellaBeatAnalysisStoryboard/Story1?:language=en-GB&:display_count=n&:origin=viz_share_link)
+
+## 💡 ACT/RECOMMENDATIONS
+1. Users are not logging in the data regularly, encouragement for the users to use the BellaBeat App regularly can help gain sufficient data. Some work can be done on the interface of the app to tackle this isuue.
+2. Some update can be made on the wellness tracking products: Leaf and Time, to give reminders to the users whenever the device tracks a long sedentary mode as the users tend to spend majority of their time in sedentary mode.
+3. A system of scoring points or some reward can be introduced when they surpass some pre-defined goal of activeness to encourage the users to stay active throughout the day on the app.
+4. The app can set a goal of daily water drinkage to encourage the Spring water bottle  users to log their water intake activity.
+5. Workout Challenges can be scheduled and designed in such a way that the users spend more active time on weekends and fairly short active time on weekdays as Sunday has the most sedentary and asleep minutes.
