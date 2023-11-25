@@ -1,0 +1,82 @@
+--The number of days each user tracked their daily activities
+SELECT
+ DISTINCT Id,
+ COUNT(ActivityDate) OVER(PARTITION BY Id) AS number_of_days_recorded
+FROM
+  `gda1-397615.Fitbit.dailyActivity_merged`
+ORDER BY number_of_days_recorded DESC;
+
+--Average minutes taken for each activity individually
+SELECT 
+  Id,
+  ROUND(AVG(VeryActiveMinutes),3) AS average_veryactiveminutes,
+  ROUND(AVG(FairlyActiveMinutes),3) AS average_fairlyactiveminutes,
+  ROUND(AVG(LightlyActiveMinutes),3) AS average_lightlyactiveminutes,
+  ROUND(AVG(SedentaryMinutes),3) AS average_sedentaryminutes
+FROM
+  `gda1-397615.Fitbit.dailyActivity_merged`
+GROUP BY Id
+Order by Id;
+
+--Average minutes taken for each activity overall
+SELECT 
+  ROUND(AVG(VeryActiveMinutes),3) AS average_veryactiveminutes,
+  ROUND(AVG(FairlyActiveMinutes),3) AS average_fairlyactiveminutes,
+  ROUND(AVG(LightlyActiveMinutes),3) AS average_lightlyactiveminutes,
+  ROUND(AVG(SedentaryMinutes),3) AS average_sedentaryminutes
+FROM
+  `gda1-397615.Fitbit.dailyActivity_merged`;
+
+--Total Minutes Asleep VS Active Minutes
+SELECT 
+  EXTRACT(DAYOFWEEK FROM ActivityDate) AS day_of_week,
+  AVG(TotalMinutesAsleep) AS average_minutes_asleep,
+  ROUND(AVG(VeryActiveMinutes),3) AS average_veryactiveminutes,
+  ROUND(AVG(FairlyActiveMinutes),3) AS average_fairlyactiveminutes,
+  ROUND(AVG(LightlyActiveMinutes),3) AS average_lightlyactiveminutes,
+  ROUND(AVG(SedentaryMinutes),3) AS average_sedentaryminutes
+FROM 
+  `gda1-397615.Fitbit.dailyActivity_merged` AS active_data
+JOIN `gda1-397615.Fitbit.sleepDay_merged_cleaned` AS sleep_data
+ON active_data.Id=sleep_data.Id
+GROUP BY 
+  day_of_week
+ORDER BY 
+  day_of_week;
+
+--Active minutes total percentage
+WITH total AS (SELECT 
+  SUM(VeryActiveMinutes) AS total_veryactiveminutes,
+  SUM(FairlyActiveMinutes) AS total_fairlyactiveminutes,
+  SUM(LightlyActiveMinutes) AS total_lightlyactiveminutes,
+  SUM(SedentaryMinutes) AS total_sedentaryminutes
+FROM
+  `gda1-397615.Fitbit.dailyActivity_merged`)
+SELECT
+   total_veryactiveminutes*100/(total_veryactiveminutes+total_fairlyactiveminutes+total_lightlyactiveminutes+total_sedentaryminutes) AS veryactive_percent,
+   total_fairlyactiveminutes*100/(total_veryactiveminutes+total_fairlyactiveminutes+total_lightlyactiveminutes+total_sedentaryminutes) AS fairlyactive_percent,
+   total_lightlyactiveminutes*100/(total_veryactiveminutes+total_fairlyactiveminutes+total_lightlyactiveminutes+total_sedentaryminutes) AS lightlyactive_percent,
+   total_sedentaryminutes*100/(total_veryactiveminutes+total_fairlyactiveminutes+total_lightlyactiveminutes+total_sedentaryminutes) AS sedentaryactive_percent
+FROM total;
+
+--Average walking weekly
+SELECT 
+  EXTRACT(DAYOFWEEK FROM ActivityDate) AS day_of_week,
+  AVG(TotalSteps) AS avg_steps_weekly
+FROM 
+  `gda1-397615.Fitbit.dailyActivity_merged`
+GROUP BY 
+  day_of_week
+ORDER BY 
+  day_of_week;
+
+--Average calories weekly
+SELECT 
+  EXTRACT(DAYOFWEEK FROM ActivityDate) AS day_of_week,
+  AVG(Calories) AS avg_steps_weekly
+FROM 
+  `gda1-397615.Fitbit.dailyActivity_merged`
+GROUP BY 
+  day_of_week
+ORDER BY 
+  day_of_week;
