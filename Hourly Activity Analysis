@@ -1,0 +1,60 @@
+--Analysis the most active time and steps of an individual
+WITH RankedSteps AS (
+  SELECT 
+    Id,
+    Date,
+    ActivityHour,
+    StepTotal,
+    Calories,
+    RANK() OVER (PARTITION BY Id, Date ORDER BY StepTotal DESC) AS rn
+  FROM
+    `gda1-397615.Fitbit.hourlyactivity_merged`
+)
+SELECT
+  DISTINCT Id,
+  Date,
+  ActivityHour,
+  StepTotal AS maximum_steps,
+  Calories AS maximum_calories
+FROM
+  RankedSteps
+WHERE
+  rn = 1
+ORDER BY
+  Id, Date;
+
+--Calculating total steps and total calories of an individual in a day
+SELECT 
+ Id,
+ Date,
+ SUM(StepTotal) AS total_steps_inaday,
+ SUM(Calories) AS total_calories_inaday
+FROM 
+ `gda1-397615.Fitbit.hourlyactivity_merged`
+GROUP BY Id, Date
+ORDER BY Id, Date;
+
+--Determining the time users were most active
+SELECT
+  DISTINCT EXTRACT(HOUR FROM TIMESTAMP(ActivityHour)) AS activity_time,
+  AVG(TotalIntensity) OVER (PARTITION BY EXTRACT(HOUR FROM TIMESTAMP(ActivityHour))) AS average_intensity,
+  AVG(METs.METs / 10.0) OVER (PARTITION BY EXTRACT(HOUR FROM TIMESTAMP(ActivityHour))) AS average_METs
+FROM 
+  `gda1-397615.Fitbit.hourly_activity` AS hourly_activity
+JOIN 
+  `gda1-397615.Fitbit.minuteMETsNarrow_merged` AS METs
+ON 
+  hourly_activity.Id = METs.Id
+  AND SAFE.PARSE_TIMESTAMP('%m-%d-%Y %H:%M', METs.ActivityMinute) IS NOT NULL
+  AND EXTRACT(HOUR FROM TIMESTAMP(PARSE_TIMESTAMP('%m-%d-%Y %H:%M', METs.ActivityMinute))) = EXTRACT(HOUR FROM TIMESTAMP(hourly_activity.ActivityHour))
+ORDER BY 
+  average_intensity DESC;
+
+--Average steps walked hourly
+SELECT 
+ ActivityHour,
+ AVG(StepTotal) AS avg_steps_hourly,
+FROM 
+ `gda1-397615.Fitbit.hourly_activity`
+GROUP BY ActivityHour
+ORDER BY ActivityHour;
