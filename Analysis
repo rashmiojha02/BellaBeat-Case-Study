@@ -1,0 +1,102 @@
+--Tacking average steps, calories and distance covered by each person
+SELECT 
+  Id,
+  ROUND(AVG(TotalSteps),3) AS average_steps,
+  ROUND(AVG(TotalDistance),3) AS average_distance,
+  ROUND(AVG(Calories),3) AS average_calories
+FROM
+  `gda1-397615.Fitbit.dailyActivity_merged`
+GROUP BY Id
+Order by Id;
+
+--Tracking overall average steps, distance and calories
+SELECT 
+  COUNT(DISTINCT id) AS total_users,
+  ROUND(AVG(TotalSteps),3) AS average_steps,
+  ROUND(AVG(TotalDistance),3) AS average_distance,
+  ROUND(AVG(Calories),3) AS average_calories
+FROM 
+  `gda1-397615.Fitbit.dailyActivity_merged`; 
+
+--Average steps weekly
+SELECT 
+  EXTRACT(DAYOFWEEK FROM ActivityDate) AS day_of_week,
+  AVG(TotalSteps) AS average_steps,
+  AVG(Calories) AS average_calories
+FROM 
+  `gda1-397615.Fitbit.dailyActivity_merged`
+GROUP BY 
+  day_of_week
+ORDER BY 
+  day_of_week;
+
+--Tracking sleep: average, minimum, maximum sleep of each person
+SELECT 
+  Id,
+  ROUND((AVG(TotalMinutesAsleep)/60),3) AS average_hours_asleep,
+  ROUND((MIN(TotalMinutesAsleep)/60),3) AS minimum_hours_asleep,
+  ROUND((MAX(TotalMinutesAsleep)/60),3) AS maximum_hours_asleep,
+  ROUND((AVG(TotalTimeInBed)/60),3) AS average_timeinbed
+FROM
+  `gda1-397615.Fitbit.sleepDay_merged_cleaned`
+GROUP BY Id
+Order by Id;
+
+--Tracking overall hours of sleep and time in bed
+SELECT 
+  COUNT(DISTINCT id) AS total_users,
+  ROUND((AVG(TotalMinutesAsleep)/60),3) AS average_hours_asleep,
+  ROUND((MIN(TotalMinutesAsleep)/60),3) AS minimum_hours_asleep,
+  ROUND((MAX(TotalMinutesAsleep)/60),3) AS maximum_hours_asleep,
+  ROUND((AVG(TotalTimeInBed)/60),3) AS average_timeinbed
+FROM 
+  `gda1-397615.Fitbit.sleepDay_merged_cleaned`; 
+
+--Tacking average weight in kg and pound of each person and their BMI rate
+SELECT 
+  Id,
+  ROUND(AVG(WeightKg),3) AS average_weight_kg,
+  ROUND(AVG(WeightPounds),3) AS average_weight_pounds,
+  ROUND(AVG(BMI),3) AS BMI
+FROM
+  `gda1-397615.Fitbit.weightLogInfo_merged`
+GROUP BY Id
+Order by Id;
+
+--Tracking overall weight, max and min weight
+SELECT 
+  COUNT(DISTINCT id) AS total_users,
+  ROUND(AVG(WeightKg),3) AS average_weight_kg,
+  ROUND(AVG(WeightPounds),3) AS average_weight_pounds,
+  ROUND(AVG(BMI),3) AS average_BMI,
+  ROUND(MIN(WeightKg),3) AS minimum_weight_kg,
+  ROUND(MAX(WeightKg),3) AS maximum_weight_kg
+FROM 
+  `gda1-397615.Fitbit.weightLogInfo_merged`; 
+
+SELECT 
+  EXTRACT(HOUR FROM SleepDay) as hour,
+  AVG(TotalMinutesAsleep) as avg_min_asleep,
+  AVG(TotalTimeInBed) as avg_tib
+FROM
+  `gda1-397615.Fitbit.sleepDay_merged_cleaned`
+GROUP BY hour
+Order by hour;
+
+--Average sleep weekly
+SELECT 
+  EXTRACT(DAYOFWEEK FROM SleepDay) AS day_of_week,
+  AVG(TotalMinutesAsleep) AS average_sleep,
+  AVG(TotalTimeInBed) AS average_tib,
+FROM 
+  `gda1-397615.Fitbit.sleepDay_merged_cleaned`
+GROUP BY 
+  day_of_week
+ORDER BY 
+  day_of_week;
+
+--Average Sleep in Hours
+SELECT 
+  AVG(TotalMinutesAsleep)/60.0 AS average_sleep,
+FROM 
+  `gda1-397615.Fitbit.sleepDay_merged`;
